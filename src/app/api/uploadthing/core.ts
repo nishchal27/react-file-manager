@@ -25,6 +25,17 @@ const middleware = async () => {
   return { subscriptionPlan, userId: user.id }
 }
 
+//function for code generation
+function generateRandomCode() {
+  // Generate a random number between 100000 and 999999
+  const randomCode = Math.floor(100000 + Math.random() * 900000);
+
+  // Convert the number to a string
+  const codeAsString = String(randomCode);
+
+  return codeAsString;
+}
+
 const onUploadComplete = async ({
   metadata,
   file,
@@ -36,7 +47,8 @@ const onUploadComplete = async ({
     url: string
   }
 }) => {
-  console.log("onuploadcomplete called",metadata, file);
+  const random6DigitCode = generateRandomCode();
+
   const isFileExist = await db.file.findFirst({
     where: {
       key: file.key,
@@ -51,6 +63,7 @@ const onUploadComplete = async ({
       name: file.name,
       userId: metadata.userId,
       url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`,
+      code: random6DigitCode,
       uploadStatus: 'PROCESSING',
     },
   })
