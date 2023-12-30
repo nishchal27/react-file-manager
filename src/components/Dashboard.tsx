@@ -20,6 +20,10 @@ import { getUserSubscriptionPlan } from "@/lib/stripe";
 interface PageProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
 }
+interface FileInfo{
+  url: string;
+  name: string;
+}
 
 const Dashboard = ({ subscriptionPlan }: PageProps) => {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<
@@ -43,9 +47,10 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
   });
 
   // Function will execute on click of the download button
-  const onClickFileDownload = () => {
+  const onClickFileDownload = (fileInfo: FileInfo) => {
+    console.log("files:",fileInfo);
     // using Java Script method to get PDF file
-    fetch("https://uploadthing-prod.s3.us-west-2.amazonaws.com/16691f12-0387-4514-b11d-cc899a313a2b-rnfo82.pdf").then((response) => {
+    fetch(fileInfo?.url).then((response) => {
       response.blob().then((blob) => {
         // Creating new object of PDF file
         const fileURL = window.URL.createObjectURL(blob);
@@ -53,7 +58,7 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
         // Setting various property values
         let alink = document.createElement("a");
         alink.href = fileURL;
-        alink.download = "SamplePDF.pdf";
+        alink.download = `${fileInfo?.name}`;
         alink.click();
       });
     });
@@ -105,7 +110,10 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
 
                   <div className="flex items-center gap-2 cursor-pointer">
                     <Button
-                    onClick={() => onClickFileDownload()}
+                    onClick={() => onClickFileDownload(file)}
+                    size="sm"
+                    className="w-full"
+                    variant="outline"
                     >
                     <DownloadCloud className="h-4 w-4" />
                     Download
