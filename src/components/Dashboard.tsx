@@ -2,25 +2,19 @@
 
 import { trpc } from "@/app/_trpc/client";
 import UploadButton from "./UploadButton";
-import {
-  Ghost,
-  Loader2,
-  MessageSquare,
-  DownloadCloud,
-  Plus,
-  Trash,
-} from "lucide-react";
+import { Ghost, Loader2, DownloadCloud, Plus, Trash } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { useState } from "react";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 
 interface PageProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
 }
-interface FileInfo{
+interface FileInfo {
   url: string;
   name: string;
 }
@@ -30,9 +24,19 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
     string | null
   >(null);
 
+  const [digitCode, setDigitCode] = useState<string | null>(null);
+  const [checkCode, setCheckCode] = useState<boolean>(false);
+
   const utils = trpc.useContext();
 
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
+
+  //function to check 6 digit code
+  const checkCodeHandler = (fileCode: string) => {
+    if (digitCode === fileCode) {
+      setCheckCode(true);
+    }
+  };
 
   const { mutate: deleteFile } = trpc.deleteFile.useMutation({
     onSuccess: () => {
@@ -48,7 +52,6 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
 
   // Function will execute on click of the download button
   const onClickFileDownload = (fileInfo: FileInfo) => {
-    console.log("files:",fileInfo);
     // using Java Script method to get PDF file
     fetch(fileInfo?.url).then((response) => {
       response.blob().then((blob) => {
@@ -98,6 +101,15 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
                           {file.name}
                         </h3>
                       </div>
+                      {checkCode ? (
+                        <span className="text-sm text-green-700">
+                          File is Ready to Download
+                        </span>
+                      ) : (
+                        <span className="text-sm text-red-700">
+                          Enter 6 digit code to download file: {file?.code}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </Link>
@@ -105,19 +117,43 @@ const Dashboard = ({ subscriptionPlan }: PageProps) => {
                 <div className="px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500">
                   <div className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    {format(new Date(file.createdAt), "MMM yyyy")}
+                    <Input
+                      type="number"
+                      onChange={(e) => {
+                        setDigitCode(e?.target?.value);
+                      }}
+                    />
                   </div>
 
-                  <div className="flex items-center gap-2 cursor-pointer">
-                    <Button
-                    onClick={() => onClickFileDownload(file)}
-                    size="sm"
-                    className="w-full"
-                    variant="outline"
-                    >
-                    <DownloadCloud className="h-4 w-4" />
-                    Download
-                    </Button>
+                  <div
+                    className={`flex items-center gap-2 ${
+                      checkCode ? "cursor-pointer" : "cursor-not-allowed"
+                    }`}
+                  >
+                    {!checkCode ? (
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        variant="secondary"
+                        onClick={() => {
+                          checkCodeHandler(file?.code);
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                        click
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => onClickFileDownload(file)}
+                        disabled={!checkCode}
+                        size="sm"
+                        className="w-full"
+                        variant="outline"
+                      >
+                        <DownloadCloud className="h-4 w-4" />
+                        Download
+                      </Button>
+                    )}
                   </div>
 
                   <Button
