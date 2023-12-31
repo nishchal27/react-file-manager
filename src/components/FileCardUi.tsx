@@ -87,7 +87,7 @@ const FileItem: React.FC<FileItemProps> = ({ file }) => {
                 </span>
               ) : (
                 <span className="text-sm text-red-700">
-                  Enter 6 digit code to download file: {file?.code}
+                  Enter 6 digit code to download <br /> file: {file?.code}
                 </span>
               )}
             </div>
