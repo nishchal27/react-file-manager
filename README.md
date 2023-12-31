@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## screenshots:
 ![dashboard](./docs_images/dashboard.png)
 ![file uploading](./docs_images/file-uploading.png)
-![file ready to download](./docs_images/file-uploading.png)
+![file ready to download](./docs_images/file%20ready%20to%20download1.png)
 
 ## Getting Started
 
