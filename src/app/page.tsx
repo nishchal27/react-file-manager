@@ -15,7 +15,7 @@ export default function Home() {
         </div>
         <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
           upload your <span className="text-blue-600">documents</span> in
-          seconds. and Mnanage them in one place.
+          seconds. and Manage them in one place.
         </h1>
         <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">
           Abhi allows you to have conversations with any PDF document. Simply
